@@ -1,1 +1,10 @@
 <%= check_box_tag 'send_to_owner', "true", false %> <%=h t('label_support_checkbox') %> (<%=h email %>)
+
+<script>
+var checkbox = $$('#send_to_owner')[0];
+
+checkbox.disable();
+$$('#notes')[0].observe('keyup', function(e) {
+  checkbox[e.target.value ? 'enable' : 'disable']();  
+});
+</script>

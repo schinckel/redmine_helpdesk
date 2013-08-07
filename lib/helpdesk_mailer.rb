@@ -16,7 +16,7 @@ class HelpdeskMailer < ActionMailer::Base
                     'Issue-Author' => issue.author.login
     redmine_headers 'Issue-Assignee' => issue.assigned_to.login if issue.assigned_to
     message_id issue
-    subject = "[#{issue.project.name} - #{issue.tracker.name} ##{issue.id}] (#{issue.status.name}) #{issue.subject}"
+    subject = "[#{issue.project.name} - #{issue.tracker.name} ##{issue.id}] #{issue.subject}"
     # Set 'from' email-address to 'helpdesk-sender-email' if available.
     # Falls back to regular redmine behaviour if 'sender' is empty.
     p = issue.project
@@ -50,28 +50,6 @@ class HelpdeskMailer < ActionMailer::Base
         :subject => subject,
         :body    => "#{text}\n\n#{footer}".gsub("##issue-id##", issue.id.to_s),
         :date    => Time.zone.now
-      )
-    elsif reply.present?
-      # sending out the first reply message
-      mail(
-        :from    => sender || Setting.mail_from,
-        :to      => recipient,
-        :subject => subject,
-        :body    => "#{reply}\n\n#{footer}".gsub("##issue-id##", issue.id.to_s),
-        :date    => Time.zone.now
-      )
-    else
-      # fallback to a regular notifications email with redmine view
-      @issue = issue
-      @journal = journal
-      @issue_url = url_for(:controller => 'issues', :action => 'show', :id => issue)
-      mail(
-        :from    => sender || Setting.mail_from,
-        :to      => recipient,
-        :subject => subject,
-        :date    => Time.zone.now,
-        :template_path => 'mailer',
-        :template_name => 'issue_edit'
       )
     end
     # return mail object to deliver it
